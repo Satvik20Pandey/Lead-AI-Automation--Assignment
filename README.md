@@ -1,3 +1,5 @@
+Made By Satvik Pandey
+
 # Excel to Zoho CRM — Lead Automation
 
 Automated pipeline that reads leads from an Excel file, validates them, and pushes valid entries to Zoho CRM. Invalid rows are logged and skipped. Uses a **hybrid architecture**: Python handles data processing + validation, while an optional n8n workflow handles API orchestration.
@@ -97,11 +99,6 @@ The script adds a **0.5s delay** between requests to stay well under the per-min
 ---
 
 ## Excel File Format
-
-| First_Name | Last_Name | Email         | Phone        | Company   | Lead_Source |
-|------------|-----------|---------------|--------------|-----------|-------------|
-| John       | Doe       | john@ex.com   | +123456789   | Acme Corp | Website     |
-| Jane       | Smith     | jane@ex.com   | +198765432   | Beta Ltd  | Event       |
 
 All columns are required. Email must be valid format, phone must be 7–15 digits (optional `+` prefix).
 

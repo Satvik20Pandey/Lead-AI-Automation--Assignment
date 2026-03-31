@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# simple log setup: terminal + run.log file
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -37,6 +38,7 @@ REQUIRED_COLS = ["First_Name", "Last_Name", "Email", "Phone", "Company", "Lead_S
 def refresh_access_token():
     """Refresh Zoho OAuth access token using the refresh token."""
     global _access_token
+    # token refresh endpoint
     url = "https://accounts.zoho.in/oauth/v2/token"
     params = {
         "refresh_token": ZOHO_REFRESH_TOKEN,
@@ -63,16 +65,19 @@ def get_access_token():
 
 def validate_row(row, idx):
     """Validate a single lead row. Returns (is_valid, error_message)."""
+    # first check: required fields should not be empty
     for col in REQUIRED_COLS:
         val = row.get(col, "")
         if pd.isna(val) or str(val).strip() == "":
             return False, f"Row {idx}: missing required field '{col}'"
 
     email = str(row["Email"]).strip()
+    # basic email format check
     if not EMAIL_RE.match(email):
         return False, f"Row {idx}: invalid email '{email}'"
 
     phone = str(row["Phone"]).strip().replace(" ", "")
+    # basic phone check: +optional and 7-15 digits
     if not PHONE_RE.match(phone):
         return False, f"Row {idx}: invalid phone '{phone}'"
 
@@ -173,6 +178,7 @@ def send_to_n8n(leads):
 
 
 def main():
+    # by default script reads sample file, else takes cli arg
     filepath = "sample_leads.xlsx"
     if len(sys.argv) > 1:
         filepath = sys.argv[1]
@@ -186,6 +192,7 @@ def main():
         log.warning("No valid leads to process")
         return
 
+    # first try n8n webhook; if down then fallback to direct Zoho API
     n8n_ok = send_to_n8n(leads)
 
     if not n8n_ok:
