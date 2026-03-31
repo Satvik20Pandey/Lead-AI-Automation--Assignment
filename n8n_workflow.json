@@ -16,7 +16,7 @@
     },
     {
       "parameters": {
-        "fieldToSplitOut": "leads",
+        "fieldToSplitOut": "body.leads",
         "options": {}
       },
       "id": "split-leads",
@@ -24,19 +24,6 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [440, 300]
-    },
-    {
-      "parameters": {
-        "batchSize": 1,
-        "options": {
-          "reset": false
-        }
-      },
-      "id": "batch-node",
-      "name": "SplitInBatches",
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
-      "position": [660, 300]
     },
     {
       "parameters": {
@@ -69,7 +56,7 @@
       "name": "Create Lead in Zoho",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [880, 300],
+      "position": [660, 300],
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 2000
@@ -80,7 +67,7 @@
       "name": "Done",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [1100, 300]
+      "position": [880, 300]
     }
   ],
   "connections": {
@@ -90,11 +77,6 @@
       ]
     },
     "Split Leads": {
-      "main": [
-        [{ "node": "SplitInBatches", "type": "main", "index": 0 }]
-      ]
-    },
-    "SplitInBatches": {
       "main": [
         [{ "node": "Create Lead in Zoho", "type": "main", "index": 0 }]
       ]
