@@ -1,0 +1,113 @@
+{
+  "name": "Zoho CRM Lead Creator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "zoho-leads",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-node",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "leads",
+        "options": {}
+      },
+      "id": "split-leads",
+      "name": "Split Leads",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "batch-node",
+      "name": "SplitInBatches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [660, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.zohoapis.in/crm/v2/Leads",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Zoho-oauthtoken {{ $env.ZOHO_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"data\": [\n    {\n      \"First_Name\": \"{{ $json.First_Name }}\",\n      \"Last_Name\": \"{{ $json.Last_Name }}\",\n      \"Email\": \"{{ $json.Email }}\",\n      \"Phone\": \"{{ $json.Phone }}\",\n      \"Company\": \"{{ $json.Company }}\",\n      \"Lead_Source\": \"{{ $json.Lead_Source }}\"\n    }\n  ]\n}",
+        "options": {
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 3,
+            "retryInterval": 2000
+          }
+        }
+      },
+      "id": "zoho-api",
+      "name": "Create Lead in Zoho",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 300],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {},
+      "id": "noop-node",
+      "name": "Done",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1100, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [{ "node": "Split Leads", "type": "main", "index": 0 }]
+      ]
+    },
+    "Split Leads": {
+      "main": [
+        [{ "node": "SplitInBatches", "type": "main", "index": 0 }]
+      ]
+    },
+    "SplitInBatches": {
+      "main": [
+        [{ "node": "Create Lead in Zoho", "type": "main", "index": 0 }]
+      ]
+    },
+    "Create Lead in Zoho": {
+      "main": [
+        [{ "node": "Done", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}
